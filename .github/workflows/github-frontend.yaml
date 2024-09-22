@@ -60,11 +60,12 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
+        CONTAINER_IMAGE: "$REGISTRY/$REPOSITORY"
         
       run: |
         # Navigate to the directory containing deployment.yaml
         cd ${{ env.MANIFEST_PATH }}
+        echo "$CONTAINER_IMAGE"
         # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
         echo "Current image tag is $imageTag"
