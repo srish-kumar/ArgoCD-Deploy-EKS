@@ -65,13 +65,13 @@ jobs:
       run: |
         # Navigate to the directory containing deployment.yaml
         cd ${{ env.MANIFEST_PATH }}
-        echo "CONTAINER_IMAGE=(${REGISTRY}/${REPOSITORY})" >> $GITHUB_ENV
-        echo "Container image is ${CONTAINER_IMAGE}"
+        # CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
+        # echo "Container image is $CONTAINER_IMAGE"
         # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
         echo "Current image tag is $imageTag"
         # Replace the current image tag with the GitHub SHA in the deployment.yaml file
-        sed -i "s~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.sha }}~g" deployment.yaml
+        sed -i "s~$REPOSITORY:$imageTag~$REPOSITORY:${{ github.sha }}~g" deployment.yaml
         echo "Updated deployment.yaml with the new GitHub SHA ${{ github.sha }}"
 
     # Step 6: Commit the changes and push to the repository

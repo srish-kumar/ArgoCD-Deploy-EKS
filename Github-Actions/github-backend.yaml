@@ -69,7 +69,7 @@ jobs:
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
         echo "Current image tag is $imageTag"
         # Replace the current image tag with the GitHub SHA in the deployment.yaml file
-        sed -i "s/$CONTAINER_IMAGE:$imageTag/$CONTAINER_IMAGE$:{{ github.sha }}/g" deployment.yaml
+        sed -i "s/$CONTAINER_IMAGE:$imageTag/$CONTAINER_IMAGE:{{ github.sha }}/g" deployment.yaml
         echo "Updated deployment.yaml with the new GitHub SHA"
 
     # Step 6: Commit the changes and push to the repository
