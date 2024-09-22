@@ -21,6 +21,7 @@ jobs:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}        # AWS Account ID stored as a secret
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID stored as a secret
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
+      MANIFEST_PATH: Kubernetes-Manifests-file/Backend
       #REPOSITORY_URI: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/"
       #GIT_USER_NAME: "YourGitHubUsername"                 # Change to your GitHub username
       #GIT_REPO_NAME: "YourRepoName"                       # Change to your repository name
@@ -35,9 +36,9 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: $AWS_ACCESS_KEY_ID
-        aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
-        aws-region: $AWS_REGION
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
     # Step 3: Login to Amazon ECR
     - name: Login to Amazon ECR
@@ -48,7 +49,7 @@ jobs:
     - name: Build, tag, and push docker image to Amazon ECR
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
-        REPOSITORY: $AWS_ECR_REPO_NAME
+        REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./Application-Code/backend
@@ -58,11 +59,13 @@ jobs:
     - name: Find and replace the image tag in deployment.yaml with the GitHub SHA 
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
-        REPOSITORY: $AWS_ECR_REPO_NAME
+        REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
         CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
+        MANIFEST_PATH: Kubernetes-Manifests-file/Backend
+        
       run: |
         # Navigate to the directory containing deployment.yaml
-        cd Kubernetes-Manifests-file/$REPOSITORY
+        cd $MANIFEST_PATH
         # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
         echo "Current image tag is $imageTag"

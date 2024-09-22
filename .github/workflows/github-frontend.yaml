@@ -22,6 +22,7 @@ jobs:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}        # AWS Account ID stored as a secret
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID stored as a secret
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
+      MANIFEST_PATH: Kubernetes-Manifests-file/Frontend
       #REPOSITORY_URI: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/"
       #GIT_USER_NAME: "YourGitHubUsername"                 # Change to your GitHub username
       #GIT_REPO_NAME: "YourRepoName"                       # Change to your repository name
@@ -37,7 +38,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION }}
 
     # Step 3: Login to Amazon ECR
     - name: Login to Amazon ECR
@@ -60,9 +61,10 @@ jobs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
         CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
+        
       run: |
         # Navigate to the directory containing deployment.yaml
-        cd Kubernetes-Manifests-file/$REPOSITORY
+        cd ${{ env.MANIFEST_PATH }}
         # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
         echo "Current image tag is $imageTag"
