@@ -61,7 +61,6 @@ jobs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
         CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
-        MANIFEST_PATH: Kubernetes-Manifests-file/Backend
         
       run: |
         # Navigate to the directory containing deployment.yaml
