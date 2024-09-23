@@ -1,13 +1,18 @@
 name: Build the Backend image, Push to ECR and Update deployment.yaml
 
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**/README.md'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - '**/README.md'
     # tags:
     #   - 'backend*'          # Trigger on push to any tag that starts with 'backend'
+
+on:
+  push:
+    tags:
+    - 'backend*'
 
 jobs:
 
