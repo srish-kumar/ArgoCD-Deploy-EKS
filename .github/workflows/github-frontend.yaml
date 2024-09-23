@@ -62,7 +62,7 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        CONTAINER_IMAGE: ${REGISTRY}/${REPOSITORY}
+        CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
         
       run: |
         # git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -73,6 +73,7 @@ jobs:
         echo "Current image tag is $imageTag"
         # Replace the current image tag with the GitHub RUN_Number in the deployment.yaml file
         sed -i "s~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.run_number }}~g" ${{ env.MANIFEST_PATH }}/deployment.yaml
+        cat ${{ env.MANIFEST_PATH }}/deployment.yaml
         echo "Updated deployment.yaml with the new GitHub RUN_Number ${{ github.run_number }}"
 
    # Step 6: Commit the changes and push to the repository to update the deployment.yaml
