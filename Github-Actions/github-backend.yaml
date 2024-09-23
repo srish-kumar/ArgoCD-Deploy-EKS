@@ -6,25 +6,23 @@ on:
       - "main"
     paths-ignore:
       - '**/README.md'
-    tags:
-      - 'backend*'          # Trigger on push to any tag that starts with 'backend'
+    # tags:
+    #   - 'backend*'          # Trigger on push to any tag that starts with 'backend'
 
 jobs:
 
-  build-and-push:
+  build-push-update:
 
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: "us-east-1"                             # AWS region
-      AWS_ECR_REPO_NAME: "backend"  # AWS ECR repository name
+      AWS_REGION: ${{ secrets.AWS_REGION }}                          # AWS region
+      AWS_ECR_REPO_NAME: backend   # AWS ECR repository name
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}        # AWS Account ID stored as a secret
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID stored as a secret
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
       MANIFEST_PATH: Kubernetes-Manifests-file/Backend
-      #REPOSITORY_URI: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/"
-      #GIT_USER_NAME: "YourGitHubUsername"                 # Change to your GitHub username
-      #GIT_REPO_NAME: "YourRepoName"                       # Change to your repository name
+      DOCKERFILE_PATH: Application-Code/backend
 
 
     steps:
@@ -50,9 +48,13 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: ${{ github.run_number }}
+      
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./Application-Code/backend
+        docker system prune -f
+        docker container prune -f
+        docker build -t $REPOSITORY ./${{ env.DOCKERFILE_PATH }}
+        docker tag $REPOSITORY $REGISTRY/$REPOSITORY:$IMAGE_TAG  # docker tag requires two arg - source tag(optional) - SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     # Step 5: Find and replace the image tag in deployment.yaml with the the GITHUB SHA
@@ -60,23 +62,26 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
         
       run: |
-        # Navigate to the directory containing deployment.yaml
-        cd $MANIFEST_PATH
-        # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
-        imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" deployment.yaml)
+
+        CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
+        # Find the current image tag after 'CONTAINER_IMAGE:' in the deployment.yaml
+        imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" ${{ env.MANIFEST_PATH }}/deployment.yaml)
         echo "Current image tag is $imageTag"
-        # Replace the current image tag with the GitHub SHA in the deployment.yaml file
-        sed -i "s/$CONTAINER_IMAGE:$imageTag/$CONTAINER_IMAGE:{{ github.sha }}/g" deployment.yaml
-        echo "Updated deployment.yaml with the new GitHub SHA"
+        # Replace the current image tag with the GitHub RUN_Number in the deployment.yaml file
+        sed -i "s~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.run_number }}~g" ${{ env.MANIFEST_PATH }}/deployment.yaml
+        cat ${{ env.MANIFEST_PATH }}/deployment.yaml
+        echo "Updated deployment.yaml with the new GitHub RUN_Number ${{ github.run_number }}"
 
     # Step 6: Commit the changes and push to the repository
     - name: Commit the changes and push to the repository
+     
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
+
         git add .
-        git commit -m "Update deployment.yaml with the new GITHUB SHA"
-        git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+        git commit -m "Update deployment.yaml with the new GITHUB RUN_Number"
+        git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+        echo "Commited and pushed the changes to the repository"

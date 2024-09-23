@@ -1,31 +1,32 @@
-name: Build the Frontend image, Push to ECR and Update deployment.yaml
+name: Build the Backend image and Push to ECR
 
 on:
   push:
     branches:
-      - main               # Trigger on push events to the main branch
+      - "main"
     paths-ignore:
       - '**/README.md'
     tags:
-      - 'frontend*'         # Trigger on push to any tag that starts with 'frontend'
+      - 'backend*'          # Trigger on push to any tag that starts with 'backend'
 
 jobs:
 
   build-push-update:
     runs-on: ubuntu-latest
 
-   # Use a condition to check if both a branch and a tag are provided
+    # Use a condition to check if both a branch and a tag are provided
     if: github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/frontend')
+
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}                          # AWS region
-      AWS_ECR_REPO_NAME: frontend   # AWS ECR repository name
+      AWS_ECR_REPO_NAME: backend   # AWS ECR repository name
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}        # AWS Account ID stored as a secret
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID stored as a secret
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
-      MANIFEST_PATH: Kubernetes-Manifests-file/Frontend
-      DOCKERFILE_PATH: Application-Code/frontend
-      
+      MANIFEST_PATH: Kubernetes-Manifests-file/Backend
+      DOCKERFILE_PATH: Application-Code/backend
+
 
     steps:
     # Step 1: Checkout the repository code
@@ -42,7 +43,7 @@ jobs:
 
     # Step 3: Login to Amazon ECR
     - name: Login to Amazon ECR
-      id: login-ecr                                            # Step ID : Assign an ID to reference the step output (registry-AWS ECR registry URL)
+      id: login-ecr                                         # Step ID : Assign an ID to furure reference the step output (registry-AWS ECR registry URL)
       uses: aws-actions/amazon-ecr-login@v2
 
     # Step 4: Build, tag, and push docker image to Amazon ECR
@@ -59,13 +60,12 @@ jobs:
         docker tag $REPOSITORY $REGISTRY/$REPOSITORY:$IMAGE_TAG  # docker tag requires two arg - source tag(optional) - SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
-
-    # Step 5: Find and replace the image tag in deployment.yaml with the the GITHUB RUN_Number
-    - name: Find and replace the image tag in deployment.yaml with the GitHub RUN_Number
+    # Step 5: Find and replace the image tag in deployment.yaml with the the GITHUB SHA
+    - name: Find and replace the image tag in deployment.yaml with the GitHub SHA 
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-
+        
       run: |
 
         CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
@@ -77,9 +77,9 @@ jobs:
         cat ${{ env.MANIFEST_PATH }}/deployment.yaml
         echo "Updated deployment.yaml with the new GitHub RUN_Number ${{ github.run_number }}"
 
-   # Step 6: Commit the changes and push to the repository to update the deployment.yaml
+    # Step 6: Commit the changes and push to the repository
     - name: Commit the changes and push to the repository
-
+     
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
