@@ -62,7 +62,7 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        
+
       run: |
         # git config --global user.email "github-actions[bot]@users.noreply.github.com"
         # git config --global user.name "github-actions[bot]"
@@ -86,3 +86,4 @@ jobs:
         git add .
         git commit -m "Update deployment.yaml with the new GITHUB RUN_Number"
         git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+        echo "Commited and pushed the changes to the repository"
