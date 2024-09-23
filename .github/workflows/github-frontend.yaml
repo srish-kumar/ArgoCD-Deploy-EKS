@@ -68,8 +68,8 @@ jobs:
         #CONTAINER_IMAGE: ${REGISTRY}/${REPOSITORY}
         
       run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
+        git config --global user.email "srish_seed@yahoo.com"
+        git config --global user.name "srish-kumar"
         # Navigate to the directory containing deployment.yaml
         #cd ${{ env.MANIFEST_PATH }}
         CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
