@@ -62,13 +62,12 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        CONTAINER_IMAGE: $REGISTRY/$REPOSITORY
-        
+        CONTAINER_IMAGE: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}
       run: |
         # git config --global user.email "github-actions[bot]@users.noreply.github.com"
         # git config --global user.name "github-actions[bot]"
 
-        CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
+        # CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
         # Find the current image tag after 'CONTAINER_IMAGE:' in the deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" ${{ env.MANIFEST_PATH }}/deployment.yaml)
         echo "Current image tag is $imageTag"
