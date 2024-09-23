@@ -1,11 +1,11 @@
 name: Build the Frontend image, Push to ECR and Update deployment.yaml
 
 on:
-  push:
-    branches:
-      - main               # Trigger on push events to the main branch
-    paths-ignore:
-      - '**/README.md'
+  # push:
+  #   branches:
+  #     - main               # Trigger on push events to the main branch
+  #   paths-ignore:
+  #     - '**/README.md'
     tags:
       - 'frontend*'         # Trigger on push to any tag that starts with 'frontend'
 
