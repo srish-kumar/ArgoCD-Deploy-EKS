@@ -14,8 +14,8 @@ jobs:
   build-push-update:
     runs-on: ubuntu-latest
 
-   # Use a condition to check if both a branch and a tag are provided
-    if: github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/frontend')
+  #  # Use a condition to check if both a branch and a tag are provided
+  #   if: github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/frontend')
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}                          # AWS region
