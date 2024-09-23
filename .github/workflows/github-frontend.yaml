@@ -11,10 +11,9 @@ on:
 
 jobs:
 
-  build-and-push:
+  build-push-update:
 
     runs-on: ubuntu-latest
-    # if: startsWith(github.ref, 'refs/tags/frontend') # Ensure the tag starts with 'frontend'
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}                          # AWS region
@@ -24,9 +23,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
       MANIFEST_PATH: Kubernetes-Manifests-file/Frontend
       DOCKERFILE_PATH: Application-Code/frontend
-      #REPOSITORY_URI: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/"
-      #GIT_USER_NAME: "YourGitHubUsername"                 # Change to your GitHub username
-      #GIT_REPO_NAME: "YourRepoName"                       # Change to your repository name
+      
 
     steps:
     # Step 1: Checkout the repository code
@@ -53,12 +50,10 @@ jobs:
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
         IMAGE_TAG: ${{ github.run_number }}
       run: |
-        # docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./Application-Code/frontend
-        # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
         docker system prune -f
         docker container prune -f
         docker build -t $REPOSITORY ./${{ env.DOCKERFILE_PATH }}
-        docker tag $REPOSITORY $REGISTRY/$REPOSITORY:$IMAGE_TAG  # docker tag requires two arg SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+        docker tag $REPOSITORY $REGISTRY/$REPOSITORY:$IMAGE_TAG  # docker tag requires two arg - source tag(optional) - SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
 
@@ -73,27 +68,13 @@ jobs:
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        # Navigate to the directory containing deployment.yaml
-        #cd ${{ env.MANIFEST_PATH }}
-        CONTAINER_IMAGE=$REGISTRY/$REPOSITORY
-        # Find the current image tag after 'CONTAINER_IMAGE:' in deployment.yaml
+
+        # Find the current image tag after 'CONTAINER_IMAGE:' in the deployment.yaml
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" ${{ env.MANIFEST_PATH }}/deployment.yaml)
         echo "Current image tag is $imageTag"
         # Replace the current image tag with the GitHub RUN_Number in the deployment.yaml file
         sed -i "s~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.run_number }}~g" ${{ env.MANIFEST_PATH }}/deployment.yaml
-        #sed -i "s~frontend:$imageTag~frontend:${{ github.run_number }}~g" ${{ env.MANIFEST_PATH }}/deployment.yaml
-        cat ${{ env.MANIFEST_PATH }}/deployment.yaml
         echo "Updated deployment.yaml with the new GitHub RUN_Number ${{ github.run_number }}"
         git add .
         git commit -m "Update deployment.yaml with the new GITHUB RUN_Number"
         git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
-        # git push https://${{ secrets.GIT_TOKEN }}@github.com/srish-kumar/ArgoCD-Deploy-EKS HEAD:main
-    # # Step 6: Commit the changes and push to the repository
-    # - name: Commit the changes and push to the repository
-    #   uses: actions/checkout@v4
-    #   run: |
-    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-    #     git config --global user.name "github-actions[bot]"
-    #     git add .
-    #     git commit -m "Update deployment.yaml with the new GITHUB SHA"
-    #     git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
