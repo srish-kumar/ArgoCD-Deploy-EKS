@@ -77,7 +77,8 @@ jobs:
         imageTag=$(grep -oP "(?<=$CONTAINER_IMAGE:)[^ ]+" ${{ env.MANIFEST_PATH }}/deployment.yaml)
         echo "Current image tag is $imageTag"
         # Replace the current image tag with the GitHub RUN_Number in the deployment.yaml file
-        sed -i 's~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.run_number }}~g' ${{ env.MANIFEST_PATH }}/deployment.yaml
+        #sed -i 's~$CONTAINER_IMAGE:$imageTag~$CONTAINER_IMAGE:${{ github.run_number }}~g' ${{ env.MANIFEST_PATH }}/deployment.yaml
+        sed -i 's~frontend:$imageTag~frontend:${{ github.run_number }}~g' ${{ env.MANIFEST_PATH }}/deployment.yaml
         cat ${{ env.MANIFEST_PATH }}/deployment.yaml
         echo "Updated deployment.yaml with the new GitHub RUN_Number ${{ github.run_number }}"
         # cd ../..
