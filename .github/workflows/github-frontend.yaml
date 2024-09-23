@@ -23,6 +23,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID stored as a secret
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key stored as a secret
       MANIFEST_PATH: Kubernetes-Manifests-file/Frontend
+      DOCKERFILE_PATH: Application-Code/frontend
       #REPOSITORY_URI: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/"
       #GIT_USER_NAME: "YourGitHubUsername"                 # Change to your GitHub username
       #GIT_REPO_NAME: "YourRepoName"                       # Change to your repository name
@@ -50,9 +51,13 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}       # Using Step ID to reference the step output (registry-AWS ECR registry URL)
         REPOSITORY: ${{ env.AWS_ECR_REPO_NAME }}
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: ${{ github.run_number }}
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./Application-Code/frontend
+        # docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./$DOCKERFILE_PATH
+        # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        docker system prune -f
+        docker container prune -f
+        docker build -t $REPOSITORY ./Application-Code/frontend
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
 
