@@ -55,9 +55,9 @@ jobs:
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./Application-Code/frontend
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
-    # Step 1: Checkout the repository code
-    - name: Checkout source code
-      uses: actions/checkout@v4
+    # # Step 1: Checkout the repository code
+    # - name: Checkout source code
+    #   uses: actions/checkout@v4
 
     # Step 5: Find and replace the image tag in deployment.yaml with the the GITHUB RUN_Number
     - name: Find and replace the image tag in deployment.yaml with the GitHub RUN_Number
