@@ -1,8 +1,13 @@
+**Pre-req:**
 # Create a new namespace in EKS:
     - Create a new namespace in the EKS cluster
     $ kubectl create ns three-tier
     - Verify 
     $ kubectl get ns
+
+# Update host to your own host in these files:  
+    1. ingress.yaml - host= srishkumar.com
+    2. Frontend/deployment.yaml  - http://srishkumar.com/api/tasks
 
 
 ## Steps to Setup a Repository in ArgoCD
