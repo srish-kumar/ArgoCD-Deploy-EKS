@@ -13,16 +13,13 @@ Points to note:
    AWS_REGION
 
 3. To run the frontend or backend pipeline, create tag staring with frontend or backend (frontend* or backend *):
-
+ ## Commands to Run:
+ ```
    git add .
    git commit -m "Commit message"
    git push origin main
    git tag -a <tag> -m "message"
    git push origin <tag>
-
-   git add .
-   git commit -m "Commit message"
-   git push origin main
    
 
 
