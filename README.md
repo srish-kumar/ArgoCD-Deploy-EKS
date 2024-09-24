@@ -9,10 +9,12 @@ Points to note:
 ![image](https://github.com/user-attachments/assets/9a0c81ca-4a57-4058-bf21-1722833d6f1c)
 
 2. Set following Repository Secrets:
-   AWS_ACCOUNT_ID
-   AWS_ACCESS_KEY_ID
-   AWS_SECRET_ACCESS_KEY
-   AWS_REGION
+  ```
+ AWS_ACCOUNT_ID
+ AWS_ACCESS_KEY_ID
+ AWS_SECRET_ACCESS_KEY
+ AWS_REGION
+```
 
 3. To run the frontend or backend pipeline, create tag staring with frontend or backend (frontend* or backend *):
  ## Commands to Run:
