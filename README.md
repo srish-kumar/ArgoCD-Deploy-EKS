@@ -20,6 +20,11 @@ Points to note:
    git tag -a <tag> -m "message"
    git push origin <tag>
 
+   git add .
+   git commit -m "Commit message"
+   git push origin main
+   
+
 
 
 
