@@ -1,6 +1,8 @@
 # ArgoCD-Deploy-EKS
 Deployment of a tree tier application on EKS cluster using GitOps tool ArgoCD.
 
+Step 1: Build application, push image to ECR and update deployment manifest file.
+
 Points to note:
 1. Settings  -> Actions -> General -> Workflow permissions
    Select Read and write permissions, which is not selected by default.
@@ -20,6 +22,9 @@ Points to note:
    git push origin main
    git tag -a <tag> -m "message"
    git push origin <tag>
+
+Step 2. Setup Argo CD
+
    
 
 
