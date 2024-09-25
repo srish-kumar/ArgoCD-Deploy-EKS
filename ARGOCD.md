@@ -24,8 +24,8 @@
     - Click on the `Connect Repo` button.
     - Fill in the repository details:
       - **Repository URL**: The URL of your Git repository.
-      - **Username**: Your Git username (if required).
-      - **Password**: Your Git password or personal access token (if required).
+      - **Username**: Your Git username (required if repo is private).
+      - **Password**: Your Git password or personal access token (required if repo is private).
 
 4. **Test the Connection**
     - Click on the `Test` button to ensure that ArgoCD can connect to your repository.
@@ -109,8 +109,8 @@ You have successfully created a new application in the ArgoCD UI.
         three-tier-ingress
 - **Path**: Enter the path to the directory containing the Kubernetes manifests.
         Kubernetes-Manifests-file/
--  Validate - Validate that a new loadbalancer is created and is in active state after the
-ingress deployment.
+- Validate - Once Ingress application is deployed, it will create an Application Load Balancer. Validate that a new
+  loadbalancer is created and is in active state after the ingress deployment.
 
 
 ## ADD DNS record in Route53

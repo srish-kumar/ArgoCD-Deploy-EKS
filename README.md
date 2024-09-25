@@ -1,5 +1,27 @@
 # ArgoCD-Deploy-EKS
-Deployment of a tree tier application on EKS cluster using GitOps tool ArgoCD.
+Deployment of a tree tier application on EKS cluster using Terraform and GitOps tool ArgoCD.
+```
+Infrastructure-as-code:
+AWS Infrastructure setup using Terraform:
+Networking setup using Terraform (VPC, subnet, security groups etc.)
+IAM roles setup
+Kubernetes (EKS) Cluster creation and setup
+Complete setup using Jenkins/GitHub pipeline.
+Deploying Ingress Controller
+Deployment of Ingress Controller, using AWS CLI and Helm charts 
+Service account setup
+Setting up load balancer for EKS cluster
+
+GitOps (For Continuous Delivery):
+GitHub pipeline to automate
+Build the application images, 
+Push the new image to private repository (ECR) and 
+Update K8s manifest files in GitHub repo (simple manifest or helm chart).
+ArgoCD to deploy new K8 changes
+Use ArgoCD to continuously monitor the manifest files/Helm chart, in GitHub repository
+Pick the changes and automatically deploy on the EKS cluster.
+DNS name mapping using Route53 to access the application.
+```
 
 **Step 1: Build application, push image to ECR and update deployment manifest file.**
 
@@ -25,7 +47,9 @@ Points to note:
    git tag -a <tag> -m "message"
    git push origin <tag>
 ```
-**Step 2. Setup Argo CD**
+
+
+
 
    
 
